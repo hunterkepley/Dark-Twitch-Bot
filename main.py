@@ -25,6 +25,7 @@ def doneJoining(l):
 s = openSocket()
 join(s)
 rb = b''
+canBet = False
 
 while True:
     rb += s.recv(1024)
@@ -36,8 +37,17 @@ while True:
         if b"PING" in i:
             s.send(i.replace(b"PING", b"PONG"))
             break
-        user = getUser(i)
-        message = getMessage(i)
-        """if b"test" in message:
-            sendMessage(s, b"You said test, " + user + b"!")
-            break""" # Message check template [incase forgetting happens]
+        user = getUser(i).decode()
+        message = getMessage(i).decode()
+        print(message)
+        # Check for ! [bot command indicator]
+        if message[0] == '!':
+            message = message[1:].lower()
+            if message == "betstart\r":
+                sendMessage(s, b"Betting has begun!")
+                canBet = True
+                break
+            elif message == "betstop\r":
+                sendMessage(s, b"Betting has stopped! Let the game begin and good luck!")
+                canBet = False
+                break
